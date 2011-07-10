@@ -123,6 +123,251 @@ describe "AttributeKit" do
       it "should mark the AttributeHash as dirty" do
         @test_hash.dirty?.should be_true
       end
+
+      it "should include the attribute in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_true
+      end
+
+      it "should include the attribute in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+      end
+    end
+
+    describe '#delete_if' do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @test_hash.delete_if {|k,v| v == 'blue'}
+      end
+
+      it "should delete only the matching items" do
+        @test_hash[:blue].should be_nil
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should mark deleted attributes as deleted" do
+        @test_hash.blue_deleted?.should be_true
+      end
+
+      it "should not mark untouched attributes as deleted" do
+        @test_hash.red_deleted?.should be_false
+      end
+
+      it "should include deleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_true
+      end
+
+      it "should include deleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+      end
+
+      it "should not include undeleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should not include undeleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should mark the AttributeHash as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+    end
+
+    describe '#keep_if' do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @test_hash.keep_if {|k,v| v == 'red'}
+      end
+
+      it "should delete only the matching items" do
+        @test_hash[:blue].should be_nil
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should mark deleted attributes as deleted" do
+        @test_hash.blue_deleted?.should be_true
+      end
+
+      it "should not mark untouched attributes as deleted" do
+        @test_hash.red_deleted?.should be_false
+      end
+
+      it "should include deleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_true
+      end
+
+      it "should include deleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+      end
+
+      it "should not include undeleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should not include undeleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should mark the AttributeHash as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+    end
+
+    describe '#reject!' do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @test_hash.reject! {|k,v| v == 'blue'}
+      end
+
+      it "should delete only the matching items" do
+        @test_hash[:blue].should be_nil
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should mark deleted attributes as deleted" do
+        @test_hash.blue_deleted?.should be_true
+      end
+
+      it "should not mark untouched attributes as deleted" do
+        @test_hash.red_deleted?.should be_false
+      end
+
+      it "should include deleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_true
+      end
+
+      it "should include deleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+      end
+
+      it "should not include undeleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should not include undeleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should mark the AttributeHash as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should return nil if no changes are made" do
+        test_hash = AttributeKit::AttributeHash.new
+        test_hash[:blue] = 'blue'
+        test_hash.clean_attributes {}
+        ret = test_hash.reject! {|k,v| v == 'red'}
+        ret.should be_nil
+      end
+    end
+
+    describe '#select!' do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @test_hash.select! {|k,v| v == 'red'}
+      end
+
+      it "should delete only the matching items" do
+        @test_hash[:blue].should be_nil
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should mark deleted attributes as deleted" do
+        @test_hash.blue_deleted?.should be_true
+      end
+
+      it "should not mark untouched attributes as deleted" do
+        @test_hash.red_deleted?.should be_false
+      end
+
+      it "should include deleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_true
+      end
+
+      it "should include deleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+      end
+
+      it "should not include undeleted attributes in dirty_keys" do
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should not include undeleted attributes in deleted_keys" do
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should mark the AttributeHash as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should return nil if no changes are made" do
+        test_hash = AttributeKit::AttributeHash.new
+        test_hash[:blue] = 'blue'
+        test_hash.clean_attributes {}
+        ret = test_hash.select! {|k,v| v == 'blue'}
+        ret.should be_nil
+      end
+    end
+
+    describe "#replace" do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @ret_val = @test_hash.replace({:yellow => 'yellow', :green => 'green'})
+      end
+
+      it "should remove old contents" do
+        @test_hash[:blue].should be_nil
+        @test_hash[:red].should be_nil
+      end
+
+      it "should replace contents with supplied hash's contents" do
+        @test_hash[:yellow].should == 'yellow'
+        @test_hash[:green].should == 'green'
+      end
+
+      it "should mark old attributes as deleted" do
+        @test_hash.blue_deleted?.should be_true
+        @test_hash.red_deleted?.should be_true
+      end
+
+      it "should mark new attributes as dirty" do
+        @test_hash.yellow_dirty?.should be_true
+        @test_hash.green_dirty?.should be_true
+      end
+
+      it "should include old keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_true
+        @test_hash.deleted_keys.include?(:red).should be_true
+      end
+
+      it "should not include new keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:yellow).should be_false
+        @test_hash.deleted_keys.include?(:green).should be_false
+      end
+
+      it "should mark instance as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should return an AttributeHash containing the new contents" do
+        @ret_val.class.should == AttributeKit::AttributeHash
+        @ret_val.eql?({:yellow => 'yellow', :green => 'green'}).should be_true
+      end
     end
 
     describe '#clean_attributes' do
