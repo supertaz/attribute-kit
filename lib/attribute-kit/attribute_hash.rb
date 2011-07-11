@@ -111,10 +111,9 @@ module AttributeKit
     # Return a key-value pair from the contents of the object and delete them.
     # @see Hash#shift
     def shift
-      old_keys = self.keys
-      r = super
-      @deleted_keys += old_keys - self.keys
-      r
+      (k,v) = super
+      @deleted_keys << k
+      [k,v]
     end
 
     # Clear all contents of the object.

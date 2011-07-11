@@ -496,6 +496,86 @@ describe "AttributeKit" do
       end
     end
 
+    describe "#shift" do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash.clean_attributes {}
+        @ret = @test_hash.shift
+      end
+
+      it "should delete a key-value pair" do
+        if @ret[0] == :blue
+          @test_hash[:blue].should be_nil
+        else
+          @test_hash[:red].should be_nil
+        end
+      end
+
+      it "should return a key-value pair" do
+        @ret.class.should == Array
+        if @ret[0] == :blue
+          @ret[1].should == 'blue'
+        else
+          @ret[1].should == 'red'
+        end
+      end
+
+      it "should mark the attribute as deleted" do
+        if @ret[0] == :blue
+          @test_hash.blue_deleted?.should be_true
+        else
+          @test_hash.red_deleted?.should be_true
+        end
+      end
+
+      it "should mark the AttributeHash as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should include the attribute in dirty_keys" do
+        if @ret[0] == :blue
+          @test_hash.dirty_keys.include?(:blue).should be_true
+        else
+          @test_hash.dirty_keys.include?(:red).should be_true
+        end
+      end
+
+      it "should include the attribute in deleted_keys" do
+        if @ret[0] == :blue
+          @test_hash.deleted_keys.include?(:blue).should be_true
+        else
+          @test_hash.deleted_keys.include?(:red).should be_true
+        end
+      end
+    end
+
+    describe "#clear" do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash[:green] = 'grn'
+        @test_hash.clean_attributes {}
+        @test_hash[:green] = 'green'
+        @old_keys = @test_hash.keys
+        @test_hash.clear
+      end
+
+      it "should empty the hash" do
+        @test_hash.empty?.should be_true
+      end
+
+      it 'should mark all keys as deleted' do
+        @test_hash.deleted_keys.should == @old_keys
+      end
+
+      it 'should mark the object as dirty' do
+        @test_hash.dirty?.should be_true
+      end
+    end
+
     describe '#clean_attributes' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
