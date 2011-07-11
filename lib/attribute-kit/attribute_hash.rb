@@ -93,8 +93,14 @@ module AttributeKit
     # @see Hash#merge!
     def merge!(other_hash, &block)
       old_keys = self.keys
+      overlapping_keys = old_keys.dup.keep_if {|v| other_hash.keys.include?(v)}
       r = super
-      @dirty_keys += self.keys - old_keys
+      if block.nil?
+        @dirty_keys += (self.keys - old_keys) + overlapping_keys
+      else
+        new_values = other_hash.keep_if {|k,v| overlapping_keys.include?(k)}
+        @dirty_keys += (self.keys - old_keys) + (new_values.keep_if {|k,v| !self[k].eql?(v) }).keys
+      end
       r
     end
 

@@ -370,6 +370,132 @@ describe "AttributeKit" do
       end
     end
 
+    describe "#merge!" do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash[:green] = 'grn'
+        @test_hash.clean_attributes {}
+        @ret_val = @test_hash.merge!({:yellow => 'yellow', :green => 'green'})
+      end
+
+      it "should retain unupdated contents" do
+        @test_hash.blue_deleted?.should be_false
+        @test_hash.red_deleted?.should be_false
+        @test_hash[:blue].should == 'blue'
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should add supplied hash's contents to object's contents" do
+        @test_hash[:yellow].should == 'yellow'
+        @test_hash[:green].should == 'green'
+      end
+
+      it "should mark new attributes as dirty" do
+        @test_hash.yellow_dirty?.should be_true
+      end
+
+      it "should mark changed attributes as dirty" do
+        @test_hash.green_dirty?.should be_true
+      end
+
+      it "should not include unupdated keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_false
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should include new keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:yellow).should be_true
+      end
+
+      it "should include changed keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:green).should be_true
+      end
+
+      it "should not include unupdated keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_false
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should not include new keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:yellow).should be_false
+        @test_hash.deleted_keys.include?(:green).should be_false
+      end
+
+      it "should mark instance as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should return an AttributeHash containing the new contents" do
+        @ret_val.class.should == AttributeKit::AttributeHash
+        @ret_val.eql?({:blue => 'blue', :red => 'red', :yellow => 'yellow', :green => 'green'}).should be_true
+      end
+    end
+
+    describe "#update" do
+      before(:each) do
+        @test_hash = AttributeKit::AttributeHash.new
+        @test_hash[:blue] = 'blue'
+        @test_hash[:red] = 'red'
+        @test_hash[:green] = 'grn'
+        @test_hash.clean_attributes {}
+        @ret_val = @test_hash.update({:yellow => 'yellow', :green => 'green'})
+      end
+
+      it "should retain unupdated contents" do
+        @test_hash.blue_deleted?.should be_false
+        @test_hash.red_deleted?.should be_false
+        @test_hash[:blue].should == 'blue'
+        @test_hash[:red].should == 'red'
+      end
+
+      it "should add supplied hash's contents to object's contents" do
+        @test_hash[:yellow].should == 'yellow'
+        @test_hash[:green].should == 'green'
+      end
+
+      it "should mark new attributes as dirty" do
+        @test_hash.yellow_dirty?.should be_true
+      end
+
+      it "should mark changed attributes as dirty" do
+        @test_hash.green_dirty?.should be_true
+      end
+
+      it "should not include unupdated keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:blue).should be_false
+        @test_hash.dirty_keys.include?(:red).should be_false
+      end
+
+      it "should include new keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:yellow).should be_true
+      end
+
+      it "should include changed keys in dirty_keys" do
+        @test_hash.dirty_keys.include?(:green).should be_true
+      end
+
+      it "should not include unupdated keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:blue).should be_false
+        @test_hash.deleted_keys.include?(:red).should be_false
+      end
+
+      it "should not include new keys in deleted_keys" do
+        @test_hash.deleted_keys.include?(:yellow).should be_false
+        @test_hash.deleted_keys.include?(:green).should be_false
+      end
+
+      it "should mark instance as dirty" do
+        @test_hash.dirty?.should be_true
+      end
+
+      it "should return an AttributeHash containing the new contents" do
+        @ret_val.class.should == AttributeKit::AttributeHash
+        @ret_val.eql?({:blue => 'blue', :red => 'red', :yellow => 'yellow', :green => 'green'}).should be_true
+      end
+    end
+
     describe '#clean_attributes' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
