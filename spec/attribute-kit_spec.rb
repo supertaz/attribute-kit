@@ -567,8 +567,16 @@ describe "AttributeKit" do
         @test_hash.empty?.should be_true
       end
 
-      it 'should mark all keys as deleted' do
+      it 'should list all former keys as deleted' do
         @test_hash.deleted_keys.should == @old_keys
+      end
+
+      it 'should list all former keys (and only former keys) as dirty, with no duplicates' do
+        @test_hash.dirty_keys.should == @old_keys
+      end
+
+      it 'should respond with true when sent #<key>_deleted?' do
+        @test_hash.green_deleted?.should be_true
       end
 
       it 'should mark the object as dirty' do
@@ -581,8 +589,12 @@ describe "AttributeKit" do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
         @test_hash[:red] = 'red'
-        @test_hash.delete(:red)
+        @test_hash[:green] = 'grn'
         @test_hash.clean_attributes {}
+        @test_hash[:green] = 'green'
+        @test_hash[:yellow] = 'yellow'
+        @test_hash.delete(:red)
+        @test_hash.clean_attributes { |change_hash| @change_hash = change_hash }
       end
 
       it "should unmark the hash as dirty" do
@@ -595,6 +607,38 @@ describe "AttributeKit" do
 
       it "should unmark an attribute as deleted" do
         @test_hash.red_deleted?.should be_false
+      end
+
+      it 'should pass the block a hash of changed keys' do
+        @change_hash.class.should == Hash
+      end
+
+      it 'should contain deleted keys in the passed hash' do
+        @change_hash.has_key?(:red).should be_true
+      end
+
+      it 'should contain changed keys in the passed hash' do
+        @change_hash.has_key?(:green).should be_true
+      end
+
+      it 'should contain added keys in the passed hash' do
+        @change_hash.has_key?(:yellow).should be_true
+      end
+
+      it 'should not contain unchanged keys in the passed hash' do
+        @change_hash.has_key?(:bluw).should be_false
+      end
+
+      it 'should contain deleted keys in the passed hash with an Array containing :deleted and nil as the value' do
+        @change_hash[:red].eql?([:deleted, nil]).should be_true
+      end
+
+      it 'should contain changed keys in the passed hash with an Array containing :changed and the new value as the value' do
+        @change_hash[:green].eql?([:changed, 'green']).should be_true
+      end
+
+      it 'should contain added keys in the passed hash with an Array containing :changed and the new value as the value' do
+        @change_hash[:yellow].eql?([:changed, 'yellow']).should be_true
       end
     end
 
