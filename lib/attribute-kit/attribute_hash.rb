@@ -15,56 +15,9 @@ module AttributeKit
   # AttributeHash inherits from and extends Hash, to provide tracking of attribute status (changed/deleted keys).
   class AttributeHash < Hash
 
-    # Creates a new instance, using identical syntax to Hash
-    # @see Hash#new
-    def initialize(*args)
-      super(*args)
-      @dirty_keys = []
-      @deleted_keys = []
-    end
-
-    # Assigns a value to a key
-    # @see Hash#[]=
-    def []=(k,v)
-      if self[k].eql? v
-        v
-      else
-        @dirty_keys << k
-        super
-      end
-    end
-
-    # @method store(key, value)
-    # Assigns a value to a key
-    # @see Hash#store
-    alias_method :store, :[]=
-
-    # Delete a key
-    # @see Hash#delete
-    def delete(k)
-      @deleted_keys << k
-      @dirty_keys.delete(k)
-      super
-    end
-
-    # @method delete_if {|key, value|}
-    # Delete keys matching an expression in the block
-    # @see Hash#delete_if
-
-    # @method keep_if {|key, value|}
-    # Delete keys not matching an expression in the block
-    # @see Hash#keep_if
-
-    # @method reject! {|key, value|}
-    # Delete keys matching an expression in the block and return nil if nothing is changed
-    # @see Hash#reject!
-
-    # @method select! {|key, value|}
-    # Delete keys not matching an expression in the block and return nil if nothing is changed
-    # @see Hash#select!
-
-    %w{delete_if keep_if reject! select!}.each do |func_name|
-      define_method(func_name.to_sym) { |&block|
+    # @visibility private
+    def self.cond_deletion_method(method_name)
+      define_method(method_name) { |&block|
         unless block.nil?
           keys = self.keys
           r = super(&block)
@@ -76,7 +29,87 @@ module AttributeKit
       }
     end
 
+    private_class_method :cond_deletion_method
+
+    # Creates a new instance, using identical syntax to Hash
+    # @see Hash#new
+    def initialize(*args)
+      super(*args)
+      @dirty_keys = []
+      @deleted_keys = []
+    end
+
+    # Assigns a value to a key
+    # @param [Object] k key of key-value pair to insert or change in instance
+    # @param [Object] v value of key-value pair to insert or change in instance
+    # @return [Object] value of key-value pair inserted
+    # @see Hash#[]=
+    def []=(k,v)
+      if self[k].eql? v
+        v
+      else
+        @dirty_keys << k
+        super
+      end
+    end
+
+    alias_method :store, :[]=
+
+    # Delete a key-value pair
+    # @param [Object] key key of key-value pair to delete from instance
+    # @return [Object] value of key-value pair deleted
+    # @see Hash#delete
+    def delete(k)
+      @deleted_keys << k
+      @dirty_keys.delete(k)
+      super
+    end
+
+    # @method reject!
+    # Delete keys matching an expression in the provided block
+    # @return [AttributeHash] if changes are made
+    # @return [Nil] if no changes are made
+    # @yield [key, value] block is executed for every key-value pair stored in the instance
+    # @yieldparam [Object] key the key from the key-value pair being evaluated
+    # @yieldparam [Object] value the value from the key-value pair being evaluated
+    # @yieldreturn [Boolean] whether or not to delete a particular stored key-value pair from the instance
+    # @see Hash#reject!
+    cond_deletion_method(:reject!)
+
+    # @method select!
+    # Delete keys not matching an expression in the provided block
+    # @return [AttributeHash] if changes are made
+    # @return [Nil] if no changes are made
+    # @yield [key, value] block is executed for every key-value pair stored in the instance
+    # @yieldparam [Object] key the key from the key-value pair being evaluated
+    # @yieldparam [Object] value the value from the key-value pair being evaluated
+    # @yieldreturn [Boolean] whether or not to keep a particular stored key-value pair in the instance
+    # @see Hash#select!
+    cond_deletion_method(:select!)
+
+    # @method keep_if
+    # Delete keys not matching an expression in the provided block
+    # @return [AttributeHash] self with changes applied
+    # @yield [key, value] block is executed for every key-value pair stored in the instance
+    # @yieldparam [Object] key the key from the key-value pair being evaluated
+    # @yieldparam [Object] value the value from the key-value pair being evaluated
+    # @yieldreturn [Boolean] whether or not to keep a particular stored key-value pair in the instance
+    # @see Hash#keep_if
+    cond_deletion_method(:keep_if)
+
+    # @method delete_if
+    # Delete keys matching an expression in the provided block
+    # @return [AttributeHash] self with changes applied
+    # @yield [key, value] block is executed for every key-value pair stored in the instance
+    # @yieldparam [Object] key the key from the key-value pair being evaluated
+    # @yieldparam [Object] value the value from the key-value pair being evaluated
+    # @yieldreturn [Boolean] whether or not to delete a particular stored key-value pair from the instance
+    # @see Hash#delete_if
+    cond_deletion_method(:delete_if)
+
     # Replace the contents of this object with the contents of the supplied hash
+    # @param [Hash] other_hash hash of values to replace instance contents with
+    # @return [AttributeHash] self with changes applied
     # @see Hash#replace
     def replace(other_hash)
       old_keys = self.keys
@@ -90,6 +123,13 @@ module AttributeKit
     # Combine the contents of this object with the contents of the supplied hash, calling an optional supplied block to
     # determine what value is used when there are duplicate keys.  Without the block, values from the supplied hash will
     # be used in the case of duplicate keys
+    # @param [Hash] other_hash hash of values to merge in to the instance
+    # @yield [key, oldval, newval] block is executed for every duplicate key between the instance and other_hash
+    # @yieldparam [Object] key the key being evaluated
+    # @yieldparam [Object] oldval the value from the value from the instance
+    # @yieldparam [Object] newval the value from the value from other_hash
+    # @yieldreturn [Object] the value to store for the key in question
+    # @return [AttributeHash] self with changes applied
     # @see Hash#merge!
     def merge!(other_hash, &block)
       old_keys = self.keys
@@ -104,11 +144,10 @@ module AttributeKit
       r
     end
 
-    # @method update(other_hash, &block)
-    # @see #merge!
     alias_method :update, :merge!
 
-    # Return a key-value pair from the contents of the object and delete them.
+    # Returns a key-value pair from the instance and deletes it.
+    # @return [Array] key-value pair
     # @see Hash#shift
     def shift
       (k,v) = super
@@ -171,15 +210,21 @@ module AttributeKit
       end
     end
 
-    # @method <key>_dirty?
-    # Check whether a particular key is dirty
-    # @return [Boolean] value indicating key-value pair state
-    # @note Uses method_missing to implement the check
+    # @overload KEY_dirty?()
+    #   Check whether a particular key is dirty - KEY is a string representation of the key name for the key-value pair being queried
+    #   @note There can be conflicts if you have multiple keys that are similar, i.e. :blue and 'blue', so only use this
+    #     when you can guarantee homogenous keys and are using either strings or symbols for the key (the only cases where
+    #     it will work)
+    #   @return [Boolean] value indicating key-value pair state
+    #   @note Uses method_missing to implement the check
+    # @overload KEY_deleted?()
+    #   Check whether a particular key has been deleted - KEY is a string representation of the key name for the key-value pair being queried
+    #   @note There can be conflicts if you have multiple keys that are similar, i.e. :blue and 'blue', so only use this
+    #     when you can guarantee homogenous keys and are using either strings or symbols for the key (the only cases where
+    #     it will work)
+    #   @return [Boolean] value indicating key-value pair state
+    #   @note Uses method_missing to implement the check
 
-    # @method <key>_deleted?
-    # Check whether a particular key has been deleted
-    # @return [Boolean] value indicating key-value pair state
-    # @note Uses method_missing to implement the check
     def method_missing(method, *args, &block)
       method_name = method.to_s
       case method_name
@@ -197,5 +242,6 @@ module AttributeKit
           end
       end
     end
+
   end
 end
