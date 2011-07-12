@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{attribute-kit}
-  s.version = ""
+  s.version = "0.1.0"
   s.platform = %q{Gem::Platform::Ruby}
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
     "LICENSE.txt",
     "README.markdown",
     "Rakefile",
+    "VERSION",
     "lib/attribute-kit.rb",
     "lib/attribute-kit/attribute-kit.rb",
     "lib/attribute-kit/attribute_hash.rb",
