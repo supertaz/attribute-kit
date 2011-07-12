@@ -22,7 +22,6 @@ Jeweler::Tasks.new do |gem|
   gem.email = "jon.mischo@gmail.com"
   gem.authors = ["Jonathan Mischo"]
   gem.version = File.exist?('VERSION') ? File.read('VERSION') : ""
-  gem.platform = 'Gem::Platform::Ruby'
   gem.files = FileList['lib/**/*.rb', '[A-Z]*', 'spec/**/*'].to_a
   # dependencies defined in Gemfile
 end
