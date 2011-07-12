@@ -17,10 +17,13 @@ Jeweler::Tasks.new do |gem|
   gem.name = "attribute-kit"
   gem.homepage = "http://github.com/supertaz/attribute-kit"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "jon@mischotech.com"
-  gem.authors = ["Jon Mischo"]
+  gem.summary = %Q{Tools for attribute tracking like Hashes with dirty tracking and events, for building hybrid models and generally going beyond what's provided by your local ORM/DRM, while allowing you to expand what you can do with them, live without them, or roll your own}
+  gem.description = %Q{Tools for attribute tracking like Hashes with dirty tracking and events, for building hybrid models and generally going beyond what's provided by your local ORM/DRM, while allowing you to expand what you can do with them, live without them, or roll your own}
+  gem.email = "jon.mischo@gmail.com"
+  gem.authors = ["Jonathan Mischo"]
+  gem.version = File.exist?('VERSION') ? File.read('VERSION') : ""
+  gem.platform = 'Gem::Platform::Ruby'
+  gem.files = FileList['lib/**/*.rb', '[A-Z]*', 'spec/**/*'].to_a
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -38,12 +41,5 @@ end
 
 task :default => :spec
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "attribute-kit #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-end
+require 'yard'
+YARD::Rake::YardocTask.new
