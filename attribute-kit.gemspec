@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{attribute-kit}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jonathan Mischo"]
-  s.date = %q{2011-07-11}
+  s.date = %q{2011-07-15}
   s.description = %q{Tools for attribute tracking like Hashes with dirty tracking and events, for building hybrid models and generally going beyond what's provided by your local ORM/DRM, while allowing you to expand what you can do with them, live without them, or roll your own}
   s.email = %q{jon.mischo@gmail.com}
   s.extra_rdoc_files = [
