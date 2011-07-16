@@ -13,6 +13,39 @@
 module AttributeKit
 
   # AttributeHash inherits from and extends Hash, to provide tracking of attribute status (changed/deleted keys).
+  #
+  # @example Basic usage
+  #   attributes = AttributeKit::AttributeHash.new              #=> {}
+  #
+  #   attributes.empty?                                         #=> true
+  #   attributes.dirty?                                         #=> false
+  #   attributes[:foo] = 'bar'                                  #=> 'bar'
+  #   attributes.dirty?                                         #=> true
+  #   attributes.dirty_keys                                     #=> [:foo]
+  #   attributes                                                #=> {:foo=>"bar"}
+  #
+  #   attributes[:bar] = 5                                      #=> 5
+  #   attributes                                                #=> {:foo=>"bar", :bar=>5}
+  #   attributes.dirty_keys                                     #=> [:foo, :bar]
+  #   attributes.deleted_keys                                   #=> []
+  #
+  #   attributes.delete(:foo)                                   #=> "bar"
+  #   attributes.dirty_keys                                     #=> [:bar, :foo]
+  #   attributes.deleted_keys                                   #=> [:foo]
+  #
+  #   attributes.clean_attributes { |dirty_attrs|               # Deleted: foo    Nil value: true
+  #     dirty_attrs.each_pair do |k,v|                          # Changed: bar    New value: 5
+  #       case v[0]
+  #         when :changed                                       #=> {:foo=>[:deleted, nil], :bar=>[:changed, 5]}
+  #           puts "Changed: #{k}    New value: #{v[1]}"
+  #         when :deleted                                       # NOTE: The lack of a return value in this block
+  #           puts "Deleted: #{k}    Nil value: #{v[1].nil?}"   #       means that dirty_attrs was returned by both
+  #       end                                                   #       the block and the method itself.  You may
+  #     end                                                     #       want to write a block to return true if it
+  #   }                                                         #       succeeds, and the dirty_attrs hash if it
+  #                                                             #       fails, so you can pass the hash to a
+  #                                                             #       method that can retry later.
+  #
   class AttributeHash < Hash
 
     # @visibility private
@@ -32,6 +65,7 @@ module AttributeKit
     private_class_method :cond_deletion_method
 
     # Creates a new instance, using identical syntax to Hash
+    # @return [AttributeHash] new instance
     # @see Hash#new
     def initialize(*args)
       super(*args)
@@ -155,7 +189,8 @@ module AttributeKit
       [k,v]
     end
 
-    # Clear all contents of the object.
+    # Clear all contents of the object and mark it as dirty.  An array of all removed keys is available via #deleted_keys.
+    # @return [AttributeHash] an empty AttributeHash
     # @see Hash#clear
     def clear
       @deleted_keys += self.keys
@@ -187,6 +222,13 @@ module AttributeKit
     # that have changed since the object was last marked clean.  Marks the object as clean when it compiles
     # the list of keys that have been modified.
     # @param [Block] block to execute with hash of modified keys, actions, and values
+    # @yield [dirty_attrs] block is executed once, with a hash of dirty attributes
+    # @yieldparam [Hash] dirty_attrs the hash of changed/deleted attributes with the modified key as the key and a value
+    #   of an array in the format: [ACTION, VALUE] where ACTION is either :changed or :deleted, and VALUE is either the
+    #   new value or nil if the attribute is deleted.  A nil value does NOT mean the attribute is deleted if the ACTION
+    #   is :changed, it means the value was actually set to nil
+    # @yieldreturn [Object] any value the block returns bubbles up, otherwise
+    # @return [Object] the return value of the block is returned
     def clean_attributes(&block)
       if !@dirty_keys.empty?
         dirty_attrs = {}

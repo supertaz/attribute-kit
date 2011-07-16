@@ -13,6 +13,56 @@ module AttributeKit
   # JSONSerializableHash adds a set of methods to manage serialization and deserialization of hashes and Hash decendants
   # in a consistent manner.  By default, the methods symbolize the keys when they are deserialized, which greatly
   # improves performance and also provides consistency in how keys appear both in JSON and in the hash.
+  #                                                                                            
+  # @example Serializing and deserializing a Hash with JSON
+  #
+  #  class JHash < Hash
+  #    include AttributeKit::JSONSerializableHash
+  #  end
+  #
+  #  attr_hash = JHash.new                                    #=> {}
+  #  attr_hash[:foo] = 'bar'                                  #=> 'bar'
+  #  attr_hash[:bar] = 5                                      #=> 5
+  #  attr_hash                                                #=> {:foo=>"bar", :bar=>5}
+  #
+  #  j = attr_hash.to_json                                    #=> "{\"foo\":\"bar\",\"bar\":5}"
+  #  new_hash = JHash.new                                     #=> {}
+  #  new_hash.from_json(j)                                    #=> {:foo=>"bar", :bar=>5}
+  #  new_hash                                                 #=> {:foo=>"bar", :bar=>5}
+  #  new_hash.clear                                           #=> {}
+  #
+  #  f = attr_hash.get_json(:foo)                             #=> "{\"foo\":\"bar\"}"
+  #  new_hash[:bar] = 5                                       #=> 5
+  #  new_hash.store_json(f)                                   #=> {:bar=>5, :foo=>"bar"}
+  #  new_hash                                                 #=> {:bar=>5, :foo=>"bar"}
+  #
+  #
+  # @example Serializing and deserializing an AttributeHash with JSON
+  #
+  #  class MyHash < AttributeKit::AttributeHash
+  #    include AttributeKit::JSONSerializableHash
+  #  end
+  #
+  #  attr_hash = MyHash.new                                   #=> {}
+  #  attr_hash.empty?                                         #=> true
+  #  attr_hash.dirty?                                         #=> false
+  #  attr_hash[:foo] = 'bar'                                  #=> 'bar'
+  #  attr_hash.dirty?                                         #=> true
+  #  attr_hash.dirty_keys                                     #=> [:foo]
+  #  attr_hash[:bar] = 5                                      #=> 5
+  #  attr_hash                                                #=> {:foo=>"bar", :bar=>5}
+  #
+  #  j = attr_hash.to_json                                    #=> "{\"foo\":\"bar\",\"bar\":5}"
+  #  new_hash = MyHash.new                                    #=> {}
+  #  new_hash.from_json(j)                                    #=> {:foo=>"bar", :bar=>5}
+  #  new_hash                                                 #=> {:foo=>"bar", :bar=>5}
+  #  new_hash.clear                                           #=> {}
+  #
+  #  f = attr_hash.get_json(:foo)                             #=> "{\"foo\":\"bar\"}"
+  #  new_hash[:bar] = 5                                       #=> 5
+  #  new_hash.store_json(f)                                   #=> {:bar=>5, :foo=>"bar"}
+  #  new_hash                                                 #=> {:bar=>5, :foo=>"bar"}
+  #
   module JSONSerializableHash
 
     # Serializes the entire hash contents into a JSON string.
