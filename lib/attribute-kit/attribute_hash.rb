@@ -235,7 +235,7 @@ module AttributeKit
         when /(.*)_deleted?/
           @deleted_keys.include?($1) || @deleted_keys.include?($1.to_sym)
         else
-          if self.class.superclass.instance_methods.include?(:method_mising)
+          if self.class.superclass.instance_methods.map(&:to_sym).include?(:method_mising)
             super(method, *args, &block)
           else
             raise NoMethodError.new("undefined method '#{method_name}' for #{self}")
