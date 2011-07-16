@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{attribute-kit}
-  s.version = "0.1.4"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jonathan Mischo"]
-  s.date = %q{2011-07-15}
+  s.date = %q{2011-07-16}
   s.description = %q{Tools for attribute tracking like Hashes with dirty tracking and events, for building hybrid models and generally going beyond what's provided by your local ORM/DRM, while allowing you to expand what you can do with them, live without them, or roll your own}
   s.email = %q{jon.mischo@gmail.com}
   s.extra_rdoc_files = [
@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
     "lib/attribute-kit.rb",
     "lib/attribute-kit/attribute-kit.rb",
     "lib/attribute-kit/attribute_hash.rb",
+    "lib/attribute-kit/json_serializable_hash.rb",
+    "spec/AttributeKit/json_serializable_hash_spec.rb",
     "spec/attribute-kit_spec.rb",
     "spec/spec_helper.rb"
   ]
@@ -39,6 +41,7 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_development_dependency(%q<yajl-ruby>, [">= 0.8.2"])
       s.add_development_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
@@ -46,6 +49,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<yard>, [">= 0"])
       s.add_development_dependency(%q<rdiscount>, [">= 0"])
     else
+      s.add_dependency(%q<yajl-ruby>, [">= 0.8.2"])
       s.add_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
@@ -54,6 +58,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdiscount>, [">= 0"])
     end
   else
+    s.add_dependency(%q<yajl-ruby>, [">= 0.8.2"])
     s.add_dependency(%q<rspec>, ["~> 2.3.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
