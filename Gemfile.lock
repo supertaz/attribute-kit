@@ -18,6 +18,7 @@ GEM
     rspec-expectations (2.3.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.3.0)
+    yajl-ruby (0.8.2)
     yard (0.7.2)
 
 PLATFORMS
@@ -29,4 +30,5 @@ DEPENDENCIES
   rcov
   rdiscount
   rspec (~> 2.3.0)
+  yajl-ruby (>= 0.8.2)
   yard

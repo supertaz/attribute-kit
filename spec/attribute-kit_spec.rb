@@ -5,8 +5,12 @@ describe "AttributeKit" do
     defined?(AttributeKit).should == 'constant'
   end
 
-  describe "::AttributeHash" do
-    describe '#new' do
+  context "::AttributeHash" do
+    it 'loads' do
+      defined?(AttributeKit::AttributeHash).should == 'constant'
+    end
+
+    context '#new' do
       it "should return an empty AttributeHash when initialized without arguments" do
         test_hash = AttributeKit::AttributeHash.new
         test_hash.empty?.should be_true
@@ -32,7 +36,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#[]=' do
+    context '#[]=' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -61,7 +65,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#store' do
+    context '#store' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash.store(:blue, 'blue')
@@ -86,7 +90,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#[]' do
+    context '#[]' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new('red')
         @test_hash[:blue] = 'blue'
@@ -103,7 +107,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#delete' do
+    context '#delete' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -133,7 +137,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#delete_if' do
+    context '#delete_if' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -176,7 +180,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#keep_if' do
+    context '#keep_if' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -219,7 +223,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#reject!' do
+    context '#reject!' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -270,7 +274,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#select!' do
+    context '#select!' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -321,7 +325,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe "#replace" do
+    context "#replace" do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -370,7 +374,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe "#merge!" do
+    context "#merge!" do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -433,7 +437,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe "#update" do
+    context "#update" do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -496,7 +500,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe "#shift" do
+    context "#shift" do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -551,7 +555,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe "#clear" do
+    context "#clear" do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
@@ -584,7 +588,7 @@ describe "AttributeKit" do
       end
     end
 
-    describe '#clean_attributes' do
+    context '#clean_attributes' do
       before(:each) do
         @test_hash = AttributeKit::AttributeHash.new
         @test_hash[:blue] = 'blue'
