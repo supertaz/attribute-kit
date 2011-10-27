@@ -1,32 +1,5 @@
 require 'set'
 
-def timeit(name = "", n = 1, multiplier = 1, divide = false)
-  t = Time.now
-  yield
-  delta = Time.now - t
-  delta /= n if divide
-  delta *= multiplier
-  puts "%15s: %2.4f" % [name, delta]
-end
-
-def stress(name, n)
-  timeit(name) do
-    n.times do
-      yield n
-    end
-  end
-end
-
-def stress2(name, n, options = {})
-  timeit(name, n, options[:multiplier], options[:divide]) do
-    options[:before] if options[:before]
-    n.times do
-      options[:each][n]
-    end
-    options[:after] if options[:after]
-  end
-end
-
 class Stresser
 
   def initialize(name, n, m, divide)
@@ -36,6 +9,15 @@ class Stresser
     }
     @name = name
     @n = n
+  end
+
+  def timeit(name = "", n = 1, multiplier = 1, divide = false)
+    t = Time.now
+    yield
+    delta = Time.now - t
+    delta /= n if divide
+    delta *= multiplier
+    puts "%15s: %2.4f" % [name, delta]
   end
 
   def before(&block)
@@ -51,14 +33,21 @@ class Stresser
   end
 
   def run
-    stress2(@name, @n, @options)
+    timeit(@name, @n, @options[:multiplier], @options[:divide]) do
+      options[:before] if options[:before]
+      n.times do
+        options[:each][n]
+      end
+      options[:after] if options[:after]
+    end
   end
-end
 
-def stress3(name, n, m = 1, divide = false, &block)
-  o = Stresser.new(name, n, m, divide)
-  o.instance_eval(&block)
-  o.run
+  def self.run(name, n, m = 1, divide = false, &block)
+    o = Stresser.new(name, n, m, divide)
+    o.instance_eval(&block)
+    o.run
+  end
+
 end
 
 namespace :benchmark do
@@ -69,22 +58,28 @@ namespace :benchmark do
   task :insertion do
     n = 10000
 
-    stress("Set", n) do |i|
-      h = Set.new
-      s = "hello#{i}"
-      h << s
+    Stresser.run("Set", n) do
+      each do |i|
+        h = Set.new
+        s = "hello#{i}"
+        h << s
+      end
     end
 
-    stress("Array", n) do |i|
-      h = []
-      s = "hello#{i}"
-      h << s
+    Stresser.run("Array", n) do
+      each do |i|
+        h = []
+        s = "hello#{i}"
+        h << s
+      end
     end
 
-    stress("Hash", n) do |i|
-      h = {}
-      s = "hello#{i}"
-      h[s] = s
+    Stresser.run("Hash", n) do
+      each do |i|
+        h = {}
+        s = "hello#{i}"
+        h[s] = s
+      end
     end
   end
 
@@ -98,7 +93,7 @@ namespace :benchmark do
       GC.disable
 
       h = Set.new
-      stress3("Set", n, 1000000, true) do
+      Stresser.run("Set", n, 1000000, true) do
         each do |i|
           s = "hello#{i}"
           h << s
@@ -106,7 +101,7 @@ namespace :benchmark do
       end
 
       h = []
-      stress3("Array", n, 1000000, true) do
+      Stresser.run("Array", n, 1000000, true) do
         each do |i|
           s = "hello#{i}"
           h << s
@@ -117,7 +112,7 @@ namespace :benchmark do
       end
 
       h = []
-      stress3("UArray", n, 1000000, true) do
+      Stresser.run("UArray", n, 1000000, true) do
         each do |i|
           s = "hello#{i}"
           h << s
@@ -126,7 +121,7 @@ namespace :benchmark do
       end
 
       h = {}
-      stress3("Hash", n, 1000000, true) do
+      Stresser.run("Hash", n, 1000000, true) do
         each do |i|
           s = "hello#{i}"
           h[:foo] = s
