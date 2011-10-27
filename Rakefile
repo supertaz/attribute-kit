@@ -42,3 +42,5 @@ task :default => :spec
 
 require 'yard'
 YARD::Rake::YardocTask.new
+
+Dir["tasks/*.rake"].each { |t| load t }
